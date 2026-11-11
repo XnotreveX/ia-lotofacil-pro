@@ -148,7 +148,7 @@ def gerar_jogo_ia(numeros_ordenados, df, colunas_bolas, jogos_anteriores=[], for
 # Adicione ou remova clientes na lista abaixo ("usuario": "senha")
 CLIENTES_AUTORIZADOS = {
     "admin": "1710",
-    "everton": "vip2026"
+    "everton": "vip2026",
     "cliente1": "loto2026",
     "vip01": "premiado10"
 }
