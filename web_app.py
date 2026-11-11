@@ -149,7 +149,6 @@ def gerar_jogo_ia(numeros_ordenados, df, colunas_bolas, jogos_anteriores=[], for
 CLIENTES_AUTORIZADOS = {
     "admin": "1234",
     "cliente1": "loto2026",
-    "everton": "vip2026",
     "vip01": "premiado10"
 }
 
@@ -262,64 +261,75 @@ with aba1:
             st.metric("Retorno em Prêmios", f"R$ {premios:,.2f}", delta=f"R$ {saldo:,.2f}")
 
 with aba2:
-    if st.button("Auditar Primeiro Jogo da Lista"):
-        jogo_analise = []
-        for linha in st.session_state.texto_jogos.split('\n'):
-            nums = [int(n) for n in re.findall(r'\d+', linha) if 1 <= int(n) <= 25]
-            if len(nums) == 15:
-                jogo_analise = sorted(list(set(nums)))
-                break
-                
-        if len(jogo_analise) != 15:
-            st.warning("Digite ou gere um jogo válido de 15 dezenas únicas na caixa acima.")
-        else:
-            aprovados = 0
+    # Coleta todos os jogos válidos da caixa de texto
+    lista_jogos_validos = []
+    for linha in st.session_state.texto_jogos.split('\n'):
+        nums = [int(n) for n in re.findall(r'\d+', linha) if 1 <= int(n) <= 25]
+        if len(nums) == 15:
+            lista_jogos_validos.append(sorted(list(set(nums))))
+
+    total_disponivel = len(lista_jogos_validos)
+
+    if total_disponivel == 0:
+        st.warning("Gere ou digite pelo menos um jogo válido de 15 dezenas na caixa acima.")
+    else:
+        # Cria o seletor numérico baseado na quantidade de jogos na caixa
+        indice_escolhido = st.number_input(
+            f"Escolha qual jogo auditar (de 1 até {total_disponivel}):",
+            min_value=1,
+            max_value=total_disponivel,
+            value=1,
+            step=1
+        )
+
+        if st.button(f"Auditar Jogo #{indice_escolhido}"):
+            jogo_analise = lista_jogos_validos[indice_escolhido - 1]
             
-            # 1. Filtro de Paridade (7, 8 ou 9 ímpares)
-            if len([n for n in jogo_analise if n % 2 != 0]) in (7, 8, 9): 
-                aprovados += 1
-                
-            # 2. Filtro de Números Primos (5 ou 6)
-            if len([n for n in jogo_analise if n in {2, 3, 5, 7, 11, 13, 17, 19, 23}]) in (5, 6): 
-                aprovados += 1
-                
-            # 3. Filtro de Soma Total (166 a 220)
-            if 166 <= sum(jogo_analise) <= 220: 
-                aprovados += 1
-                
-            # 4. Filtro de Moldura (9, 10 ou 11 dezenas)
-            if len([n for n in jogo_analise if n in {1, 2, 3, 4, 5, 6, 10, 11, 15, 16, 20, 21, 22, 23, 24, 25}]) in (9, 10, 11): 
-                aprovados += 1
-                
-            # 5. Filtro de Sequência Máxima (até 5 seguidas)
-            if calcular_maior_sequencia(jogo_analise) <= 5: 
-                aprovados += 1
-                
-            # 6. Filtro de Repetidos do Último Concurso (8, 9 ou 10)
-            ultimo_sorteio = set(df.iloc[-1][colunas_bolas].dropna().values)
-            if len(set(jogo_analise).intersection(ultimo_sorteio)) in (8, 9, 10): 
-                aprovados += 1
-            
-            aderencia = (aprovados / 6) * 100
-            premiados = sum(
-                1 for _, row in df.iterrows() 
-                if len(set(jogo_analise).intersection(set(row[colunas_bolas].dropna().values))) >= 11
-            )
-            freq_retorno = (premiados / len(df)) * 100
-            
-            st.info(f"**Jogo Analisado:** {' - '.join(f'{x:02d}' for x in jogo_analise)}")
-            
-            col_a, col_b = st.columns(2)
-            col_a.metric("Aderência aos Padrões", f"{aderencia:.1f}%")
-            col_b.metric("Frequência de Retorno", f"{freq_retorno:.1f}%", f"{premiados} prêmios")
-            
-            # Veredito visual no celular
-            if aderencia >= 80:
-                st.success("🔥 **EXCELENTE ESTRUTURA:** Altas chances de passar nos filtros oficiais.")
-            elif aderencia >= 50:
-                st.warning("🟡 **ESTRUTURA MEDIANA:** Pode flutuar fora dos padrões mais comuns.")
+            if len(jogo_analise) != 15:
+                st.error("O jogo escolhido possui números repetidos. Verifique as 15 dezenas.")
             else:
-                st.error("❌ **ESTRUTURA FRACA:** Raramente esse padrão ocorre nos sorteios.")
+                aprovados = 0
+                
+                # 1. Paridade
+                if len([n for n in jogo_analise if n % 2 != 0]) in (7, 8, 9): 
+                    aprovados += 1
+                # 2. Primos
+                if len([n for n in jogo_analise if n in {2, 3, 5, 7, 11, 13, 17, 19, 23}]) in (5, 6): 
+                    aprovados += 1
+                # 3. Soma
+                if 166 <= sum(jogo_analise) <= 220: 
+                    aprovados += 1
+                # 4. Moldura
+                if len([n for n in jogo_analise if n in {1, 2, 3, 4, 5, 6, 10, 11, 15, 16, 20, 21, 22, 23, 24, 25}]) in (9, 10, 11): 
+                    aprovados += 1
+                # 5. Sequência Máxima
+                if calcular_maior_sequencia(jogo_analise) <= 5: 
+                    aprovados += 1
+                # 6. Repetidos do último sorteio
+                ultimo_sorteio = set(df.iloc[-1][colunas_bolas].dropna().values)
+                if len(set(jogo_analise).intersection(ultimo_sorteio)) in (8, 9, 10): 
+                    aprovados += 1
+                
+                aderencia = (aprovados / 6) * 100
+                premiados = sum(
+                    1 for _, row in df.iterrows() 
+                    if len(set(jogo_analise).intersection(set(row[colunas_bolas].dropna().values))) >= 11
+                )
+                freq_retorno = (premiados / len(df)) * 100
+                
+                st.info(f"**Jogo #{indice_escolhido} Analisado:** {' - '.join(f'{x:02d}' for x in jogo_analise)}")
+                
+                col_a, col_b = st.columns(2)
+                col_a.metric("Aderência aos Padrões", f"{aderencia:.1f}%")
+                col_b.metric("Frequência de Retorno", f"{freq_retorno:.1f}%", f"{premiados} prêmios")
+                
+                if aderencia >= 80:
+                    st.success("🔥 **EXCELENTE ESTRUTURA:** Altas chances de passar nos filtros oficiais.")
+                elif aderencia >= 50:
+                    st.warning("🟡 **ESTRUTURA MEDIANA:** Pode flutuar fora dos padrões mais comuns.")
+                else:
+                    st.error("❌ **ESTRUTURA FRACA:** Raramente esse padrão ocorre nos sorteios.")
+
 with aba3:
     if st.button("Verificar Status do Ciclo Atual"):
         try:
