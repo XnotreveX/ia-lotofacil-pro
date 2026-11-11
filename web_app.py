@@ -144,7 +144,6 @@ def gerar_jogo_ia(numeros_ordenados, df, colunas_bolas, jogos_anteriores=[], for
     return sorted(random.sample(range(1, 26), 15))
 
 # --- 2. INTERFACE VISUAL MOBILE/WEB ---
-st.title("🤖 IA Lotofácil Pro")
 # --- SISTEMA DE LOGIN E CONTROLE DE ACESSO ---
 # Adicione ou remova clientes na lista abaixo ("usuario": "senha")
 CLIENTES_AUTORIZADOS = {
