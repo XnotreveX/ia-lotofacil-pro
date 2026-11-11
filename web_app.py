@@ -149,7 +149,6 @@ def gerar_jogo_ia(numeros_ordenados, df, colunas_bolas, jogos_anteriores=[], for
 CLIENTES_AUTORIZADOS = {
     "admin": "1234",
     "cliente1": "loto2026",
-    "everton": "vip2026",
     "vip01": "premiado10"
 }
 
@@ -322,7 +321,10 @@ with aba2:
                 
                 col_a, col_b = st.columns(2)
                 col_a.metric("Aderência aos Padrões", f"{aderencia:.1f}%")
+                col_a.caption("Nota de estrutura nas 6 regras matemáticas.")
+                
                 col_b.metric("Frequência de Retorno", f"{freq_retorno:.1f}%", f"{premiados} prêmios")
+                col_b.caption(f"Taxa de premiação em {len(df)} sorteios.")
                 
                 if aderencia >= 80:
                     st.success("🔥 **EXCELENTE ESTRUTURA:** Altas chances de passar nos filtros oficiais.")
@@ -330,6 +332,7 @@ with aba2:
                     st.warning("🟡 **ESTRUTURA MEDIANA:** Pode flutuar fora dos padrões mais comuns.")
                 else:
                     st.error("❌ **ESTRUTURA FRACA:** Raramente esse padrão ocorre nos sorteios.")
+
 
 with aba3:
     if st.button("Verificar Status do Ciclo Atual"):
