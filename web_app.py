@@ -149,7 +149,6 @@ def gerar_jogo_ia(numeros_ordenados, df, colunas_bolas, jogos_anteriores=[], for
 CLIENTES_AUTORIZADOS = {
     "admin": "1234",
     "cliente1": "loto2026",
-    "everton": "vip2026",
     "vip01": "premiado10"
 }
 
@@ -176,12 +175,6 @@ if not st.session_state.autenticado:
             
     st.stop()
 
-if st.sidebar.button("🚪 Sair / Trocar Conta"):
-    st.session_state.autenticado = False
-    st.rerun()
-
-
-# Botão discreto no topo para sair da conta
 if st.sidebar.button("🚪 Sair / Trocar Conta"):
     st.session_state.autenticado = False
     st.rerun()
