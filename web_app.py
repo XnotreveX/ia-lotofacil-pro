@@ -145,6 +145,39 @@ def gerar_jogo_ia(numeros_ordenados, df, colunas_bolas, jogos_anteriores=[], for
 
 # --- 2. INTERFACE VISUAL MOBILE/WEB ---
 st.title("🤖 IA Lotofácil Pro")
+# --- SISTEMA DE LOGIN E CONTROLE DE ACESSO ---
+# Adicione ou remova clientes na lista abaixo ("usuario": "senha")
+CLIENTES_AUTORIZADOS = {
+    "admin": "1234",
+    "cliente1": "loto2026",
+    "vip01": "premiado10"
+}
+
+if "autenticado" not in st.session_state:
+    st.session_state.autenticado = False
+
+if not st.session_state.autenticado:
+    st.title("🔒 Acesso Restrito - IA Lotofácil Pro")
+    st.write("Digite seu usuário e senha exclusivos para liberar o sistema.")
+    
+    usuario_digitado = st.text_input("Usuário:")
+    senha_digitada = st.text_input("Senha:", type="password")
+    
+    if st.button("ENTRAR NO SISTEMA", type="primary"):
+        if usuario_digitado in CLIENTES_AUTORIZADOS and CLIENTES_AUTORIZADOS[usuario_digitado] == senha_digitada:
+            st.session_state.autenticado = True
+            st.rerun()
+        else:
+            st.error("❌ Usuário ou senha incorretos. Verifique seus dados de acesso.")
+            
+    # Trava a execução aqui para esconder o restante do aplicativo até o login ser feito
+    st.stop()
+
+# Botão discreto no topo para sair da conta
+if st.sidebar.button("🚪 Sair / Trocar Conta"):
+    st.session_state.autenticado = False
+    st.rerun()
+
 st.caption("Motor Analítico • Tendência Curta • Rastreador de Ciclos")
 
 try:
