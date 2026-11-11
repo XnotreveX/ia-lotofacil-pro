@@ -145,10 +145,9 @@ def gerar_jogo_ia(numeros_ordenados, df, colunas_bolas, jogos_anteriores=[], for
 
 # --- 2. INTERFACE VISUAL MOBILE/WEB ---
 # --- SISTEMA DE LOGIN E CONTROLE DE ACESSO ---
-# Adicione ou remova clientes na lista abaixo ("usuario": "senha")
+# Cadastre os usuários sempre em letras minúsculas ("usuario": "senha")
 CLIENTES_AUTORIZADOS = {
-    "admin": "1710",
-    "everton": "vip2026",
+    "admin": "1234",
     "cliente1": "loto2026",
     "vip01": "premiado10"
 }
@@ -164,14 +163,22 @@ if not st.session_state.autenticado:
     senha_digitada = st.text_input("Senha:", type="password")
     
     if st.button("ENTRAR NO SISTEMA", type="primary"):
-        if usuario_digitado in CLIENTES_AUTORIZADOS and CLIENTES_AUTORIZADOS[usuario_digitado] == senha_digitada:
+        # Limpa espaços invisíveis e converte o usuário para minúsculas
+        usuario_limpo = usuario_digitado.strip().lower()
+        senha_limpa = senha_digitada.strip()
+        
+        if usuario_limpo in CLIENTES_AUTORIZADOS and CLIENTES_AUTORIZADOS[usuario_limpo] == senha_limpa:
             st.session_state.autenticado = True
             st.rerun()
         else:
             st.error("❌ Usuário ou senha incorretos. Verifique seus dados de acesso.")
             
-    # Trava a execução aqui para esconder o restante do aplicativo até o login ser feito
     st.stop()
+
+if st.sidebar.button("🚪 Sair / Trocar Conta"):
+    st.session_state.autenticado = False
+    st.rerun()
+
 
 # Botão discreto no topo para sair da conta
 if st.sidebar.button("🚪 Sair / Trocar Conta"):
