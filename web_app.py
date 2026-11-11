@@ -146,13 +146,6 @@ def gerar_jogo_ia(numeros_ordenados, df, colunas_bolas, jogos_anteriores=[], for
 # --- 2. INTERFACE VISUAL MOBILE/WEB ---
 # --- SISTEMA DE LOGIN E CONTROLE DE ACESSO ---
 # Cadastre os usuários sempre em letras minúsculas ("usuario": "senha")
-CLIENTES_AUTORIZADOS = {
-    "admin": "1234",
-    "cliente1": "loto2026",
-    "everton": "vip2026",
-    "vip01": "premiado10"
-}
-
 if "autenticado" not in st.session_state:
     st.session_state.autenticado = False
 
@@ -164,11 +157,13 @@ if not st.session_state.autenticado:
     senha_digitada = st.text_input("Senha:", type="password")
     
     if st.button("ENTRAR NO SISTEMA", type="primary"):
-        # Limpa espaços invisíveis e converte o usuário para minúsculas
         usuario_limpo = usuario_digitado.strip().lower()
         senha_limpa = senha_digitada.strip()
         
-        if usuario_limpo in CLIENTES_AUTORIZADOS and CLIENTES_AUTORIZADOS[usuario_limpo] == senha_limpa:
+        # Lê a lista protegida direto do cofre do Streamlit Cloud
+        lista_clientes = st.secrets.get("usuarios", {})
+        
+        if usuario_limpo in lista_clientes and str(lista_clientes[usuario_limpo]) == senha_limpa:
             st.session_state.autenticado = True
             st.rerun()
         else:
